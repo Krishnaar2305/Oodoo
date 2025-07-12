@@ -17,6 +17,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use(cors({
+  origin: 'http://localhost:3000',  // your React frontend port
+  credentials: true
+}));
+
+
 // Log incoming requests
 app.use((req, res, next) => {
     console.log(req.path, req.method);
@@ -24,7 +30,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/user', userRoutes);
+app.use('/api/users', userRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
