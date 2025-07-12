@@ -14,13 +14,26 @@ const userSchema = new schema({
     skills: { type: Array, default: [] },
     wantedSkills: { type: Array, default: [] },
     availability: { type: Array, default: [] },
-    pendingSkillSwaps: { type: Array, default: [] },
+    pendingSkillSwaps: {
+        type: [
+          {
+            userEmail: { type: String, required: true },
+            offeredSkill: { type: String, required: true },
+            wantedSkill: { type: String, required: true }
+          }
+        ],
+        default: []
+    },
+    pendingSkillSwaps_messages: {
+        type: Map,
+        of: String, 
+        default: {}
+    },      
     acceptedSkillSwaps: { type: Array, default: [] },
     ratings: { type: Array, default: [] },
     public: { type: Boolean, default: true },
     isAdmin: { type: Boolean, default: false },
 }, { timestamps: true });
-
 
 // STATIC METHODS
 
