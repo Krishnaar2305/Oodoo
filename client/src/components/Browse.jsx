@@ -49,33 +49,31 @@ const Browse = () => {
     const filterUsers = () => {
         let filtered = [...users];
 
-        // Filter by availability
         if (availabilityFilter !== 'all') {
-            filtered = filtered.filter((user) =>
+            filtered = filtered.filter(user =>
                 user.availability?.includes(availabilityFilter)
             );
         }
 
-        // Search by name
         if (searchName.trim() !== '') {
-            filtered = filtered.filter((user) =>
+            filtered = filtered.filter(user =>
                 user.name.toLowerCase().includes(searchName.toLowerCase())
             );
         }
 
-        // Search by skill (in skills or wantedSkills)
         if (searchSkill.trim() !== '') {
-            filtered = filtered.filter((user) =>
-                (user.skills || []).some((skill) =>
+            filtered = filtered.filter(user =>
+                (user.skills || []).some(skill =>
                     skill.toLowerCase().includes(searchSkill.toLowerCase())
                 ) ||
-                (user.wantedSkills || []).some((skill) =>
+                (user.wantedSkills || []).some(skill =>
                     skill.toLowerCase().includes(searchSkill.toLowerCase())
                 )
             );
         }
 
         setFilteredUsers(filtered);
+        setCurrentPage(1);
     };
 
     const handleRequestSkill = (user) => {
@@ -120,7 +118,12 @@ const Browse = () => {
 
     const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-    if (loading) return <div className="p-6 text-center">Loading...</div>;
+    if (loading) return (
+        <div className="p-6 text-center text-lg font-medium text-gray-600">
+            Loading...
+        </div>
+    );
+
     if (error)
         return <div className="p-6 text-center text-red-500">{error}</div>;
 
@@ -159,13 +162,9 @@ const Browse = () => {
                         onChange={(e) => setAvailabilityFilter(e.target.value)}
                     >
                         <option value="all">All</option>
-                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(
-                            (day) => (
-                                <option key={day} value={day}>
-                                    {day}
-                                </option>
-                            )
-                        )}
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                            <option key={day} value={day}>{day}</option>
+                        ))}
                     </select>
                 </div>
             </div>
@@ -190,10 +189,7 @@ const Browse = () => {
                             <strong>Skills Offered:</strong>
                             <div className="flex flex-wrap gap-1 mt-1">
                                 {user.skills?.map((skill, i) => (
-                                    <span
-                                        key={i}
-                                        className="bg-blue-100 text-blue-700 px-2 py-1 text-xs rounded"
-                                    >
+                                    <span key={i} className="bg-blue-100 text-blue-700 px-2 py-1 text-xs rounded">
                                         {skill}
                                     </span>
                                 ))}
@@ -204,10 +200,7 @@ const Browse = () => {
                             <strong>Skills Wanted:</strong>
                             <div className="flex flex-wrap gap-1 mt-1">
                                 {user.wantedSkills?.map((skill, i) => (
-                                    <span
-                                        key={i}
-                                        className="bg-green-100 text-green-700 px-2 py-1 text-xs rounded"
-                                    >
+                                    <span key={i} className="bg-green-100 text-green-700 px-2 py-1 text-xs rounded">
                                         {skill}
                                     </span>
                                 ))}
@@ -218,10 +211,7 @@ const Browse = () => {
                             <strong>Availability:</strong>
                             <div className="flex flex-wrap gap-1 mt-1">
                                 {user.availability?.map((day, i) => (
-                                    <span
-                                        key={i}
-                                        className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded"
-                                    >
+                                    <span key={i} className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
                                         {day}
                                     </span>
                                 ))}
@@ -239,20 +229,18 @@ const Browse = () => {
             </div>
 
             {totalPages > 1 && (
-                <div className="mt-6 flex justify-center space-x-4">
+                <div className="mt-6 flex justify-center items-center space-x-4">
                     <button
                         disabled={currentPage === 1}
-                        onClick={() => setCurrentPage((c) => Math.max(1, c - 1))}
+                        onClick={() => setCurrentPage(c => Math.max(1, c - 1))}
                         className="px-3 py-1 border rounded disabled:opacity-50"
                     >
                         Previous
                     </button>
-                    <span>
-                        {currentPage} / {totalPages}
-                    </span>
+                    <span>{currentPage} / {totalPages}</span>
                     <button
                         disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage((c) => Math.min(totalPages, c + 1))}
+                        onClick={() => setCurrentPage(c => Math.min(totalPages, c + 1))}
                         className="px-3 py-1 border rounded disabled:opacity-50"
                     >
                         Next
@@ -260,35 +248,29 @@ const Browse = () => {
                 </div>
             )}
 
-            {showRequestModal && (
+            {showRequestModal && selectedUser && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md shadow">
                         <h3 className="text-lg font-semibold mb-2">Request Skill Swap</h3>
-                        <p className="text-sm mb-4">To: {selectedUser?.name}</p>
+                        <p className="text-sm mb-4">To: {selectedUser.name}</p>
 
                         <label className="block text-sm font-medium mb-1">Your Skill to Offer:</label>
                         <input
                             type="text"
                             className="w-full border rounded p-2 mb-3"
                             value={requestForm.offeredSkill}
-                            onChange={(e) =>
-                                setRequestForm({ ...requestForm, offeredSkill: e.target.value })
-                            }
+                            onChange={(e) => setRequestForm({ ...requestForm, offeredSkill: e.target.value })}
                         />
 
                         <label className="block text-sm font-medium mb-1">Skill You Want:</label>
                         <select
                             className="w-full border rounded p-2 mb-3"
                             value={requestForm.targetSkill}
-                            onChange={(e) =>
-                                setRequestForm({ ...requestForm, targetSkill: e.target.value })
-                            }
+                            onChange={(e) => setRequestForm({ ...requestForm, targetSkill: e.target.value })}
                         >
                             <option value="">Select a skill</option>
-                            {selectedUser?.skills?.map((skill, idx) => (
-                                <option key={idx} value={skill}>
-                                    {skill}
-                                </option>
+                            {selectedUser.skills?.map((skill, idx) => (
+                                <option key={idx} value={skill}>{skill}</option>
                             ))}
                         </select>
 
@@ -297,9 +279,7 @@ const Browse = () => {
                             className="w-full border rounded p-2 mb-3"
                             rows="4"
                             value={requestForm.message}
-                            onChange={(e) =>
-                                setRequestForm({ ...requestForm, message: e.target.value })
-                            }
+                            onChange={(e) => setRequestForm({ ...requestForm, message: e.target.value })}
                         />
 
                         <div className="flex justify-end gap-3">
